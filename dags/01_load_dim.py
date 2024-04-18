@@ -31,7 +31,6 @@ with DAG(
         database='food_delivery_db',
         db_user='awsuser',
         aws_conn_id='redshift',
-        region_name='us-east-2',
         sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
     )
 

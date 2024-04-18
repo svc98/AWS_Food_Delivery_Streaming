@@ -1,0 +1,18 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - echo "Starting build process..."
+  build:
+    commands:
+      - echo "Copying DAG files to S3..."
+      - aws s3 cp --recursive ./dags s3://airflow-custom-dags/dags/
+      - echo "Copying dim data files to S3..."
+      - aws s3 cp --recursive ./data s3://food-delivery-stream/dims/
+      - echo "Copying pyspark scripts to S3..."
+      - aws s3 cp --recursive ./scripts/pyspark_streaming.py s3://food-delivery-stream/pyspark_scripts/
+      - echo "Copying redshift jar file to S3..."
+      - aws s3 cp --recursive ./jars s3://food-delivery-stream/jars/redshift-connector-jar/
+  post_build:
+    commands:
+      - echo "Build and deployment process complete!!!"

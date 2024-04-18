@@ -30,7 +30,6 @@ with DAG(
         task_id='create_schema',
         database='dev',
         sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
-        db_user='awsuser',
         aws_conn_id='redshift'
     )
 

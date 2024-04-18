@@ -4,6 +4,7 @@ from airflow.utils.dates import days_ago
 from airflow.providers.amazon.aws.transfers.s3_to_redshift import S3ToRedshiftOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.providers.amazon.aws.operators.redshift_data import RedshiftDataOperator
+from airflow.providers.amazon.aws.operators.redshift_sql import RedshiftSQLOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
 
@@ -30,7 +31,9 @@ with DAG(
         task_id='create_schema',
         database='dev',
         sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
-        aws_conn_id='redshift'
+        params={
+            "schema": "food_delivery_db"
+        }
     )
 
     # Drop tables if they exist

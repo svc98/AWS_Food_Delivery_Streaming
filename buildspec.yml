@@ -10,7 +10,7 @@ phases:
       - echo "Copying dim data files to S3..."
       - aws s3 cp --recursive --debug "./data" "s3://food-delivery-stream/dims/"
       - echo "Copying pyspark scripts to S3..."
-      - aws s3 cp --recursive --debug "./scripts/pyspark_streaming.py" "s3://food-delivery-stream/pyspark_scripts/pyspark_streaming.py"
+      - aws s3 cp --debug "./scripts/pyspark_streaming.py" "s3://food-delivery-stream/pyspark_scripts/pyspark_streaming.py"
       - echo "Copying redshift jar file to S3..."
       - aws s3 cp --recursive --debug "./jars" "s3://food-delivery-stream/jars/redshift-connector-jar/"
   post_build:

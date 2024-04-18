@@ -34,11 +34,6 @@ with DAG(
         region_name='us-east-2',
         sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
     )
-    # create_schema = PostgresOperator(
-    #     task_id='create_schema',
-    #     postgres_conn_id='redshift',
-    #     sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
-    # )
 
     # Drop tables if they exist
     drop_dimCustomers = PostgresOperator(

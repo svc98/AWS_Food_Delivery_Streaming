@@ -28,7 +28,7 @@ with DAG(
     # Create schema if it doesn't exist
     create_schema = RedshiftDataOperator(
         task_id='create_schema',
-        database='food_delivery_db',
+        database='dev',
         db_user='awsuser',
         aws_conn_id='redshift',
         sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",

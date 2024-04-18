@@ -30,38 +30,38 @@ with DAG(
         task_id='create_schema',
         database='dev',
         sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
-        aws_conn_id='redshift'
+        aws_conn_id='redshift_conn'
     )
 
     # Drop tables if they exist
     drop_dimCustomers = PostgresOperator(
         task_id='drop_dimCustomers',
-        postgres_conn_id='redshift',
+        postgres_conn_id='redshift_conn',
         sql="DROP TABLE IF EXISTS food_delivery_db.dimCustomers;",
     )
 
     drop_dimRestaurants = PostgresOperator(
         task_id='drop_dimRestaurants',
-        postgres_conn_id='redshift',
+        postgres_conn_id='redshift_conn',
         sql="DROP TABLE IF EXISTS food_delivery_db.dimRestaurants;",
     )
 
     drop_dimDeliveryDrivers = PostgresOperator(
         task_id='drop_dimDeliveryDrivers',
-        postgres_conn_id='redshift',
+        postgres_conn_id='redshift_conn',
         sql="DROP TABLE IF EXISTS food_delivery_db.dimDeliveryDrivers;",
     )
 
     drop_factOrders = PostgresOperator(
         task_id='drop_factOrders',
-        postgres_conn_id='redshift',
+        postgres_conn_id='redshift_conn',
         sql="DROP TABLE IF EXISTS food_delivery_db.factOrders;",
     )
 
     # Create dimension and fact tables
     create_dimCustomers = PostgresOperator(
         task_id='create_dimCustomers',
-        postgres_conn_id='redshift',
+        postgres_conn_id='redshift_conn',
         sql="""
             CREATE TABLE food_delivery_db.dimCustomers (
                 CustomerID INT PRIMARY KEY,
@@ -76,7 +76,7 @@ with DAG(
 
     create_dimRestaurants = PostgresOperator(
         task_id='create_dimRestaurants',
-        postgres_conn_id='redshift',
+        postgres_conn_id='redshift_conn',
         sql="""
             CREATE TABLE food_delivery_db.dimRestaurants (
                 RestaurantID INT PRIMARY KEY,
@@ -90,7 +90,7 @@ with DAG(
 
     create_dimDeliveryDrivers = PostgresOperator(
         task_id='create_dimDeliveryDrivers',
-        postgres_conn_id='redshift',
+        postgres_conn_id='redshift_conn',
         sql="""
             CREATE TABLE food_delivery_db.dimDeliveryDrivers (
                 DriverID INT PRIMARY KEY,
@@ -105,7 +105,7 @@ with DAG(
 
     create_factOrders = PostgresOperator(
         task_id='create_factOrders',
-        postgres_conn_id='redshift',
+        postgres_conn_id='redshift_conn',
         sql="""
             CREATE TABLE food_delivery_db.factOrders (
                 OrderID INT PRIMARY KEY,
@@ -131,7 +131,7 @@ with DAG(
         s3_key='dim/dimCustomers.csv',
         copy_options=['CSV', 'IGNOREHEADER 1', 'QUOTE as \'"\''],
         aws_conn_id='aws_default',
-        redshift_conn_id='redshift',
+        redshift_conn_id='redshift_conn',
     )
 
     load_dimRestaurants = S3ToRedshiftOperator(
@@ -142,7 +142,7 @@ with DAG(
         s3_key='dim/dimRestaurants.csv',
         copy_options=['CSV', 'IGNOREHEADER 1', 'QUOTE as \'"\''],
         aws_conn_id='aws_default',
-        redshift_conn_id='redshift',
+        redshift_conn_id='redshift_conn',
     )
 
     load_dimDeliveryDrivers = S3ToRedshiftOperator(
@@ -153,7 +153,7 @@ with DAG(
         s3_key='dim/dimDeliveryDrivers.csv',
         copy_options=['CSV', 'IGNOREHEADER 1', 'QUOTE as \'"\''],
         aws_conn_id='aws_default',
-        redshift_conn_id='redshift',
+        redshift_conn_id='redshift_conn',
     )
 
     trigger_spark_streaming_dag = TriggerDagRunOperator(

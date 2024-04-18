@@ -29,8 +29,9 @@ with DAG(
     create_schema = RedshiftDataOperator(
         task_id='create_schema',
         cluster_identifier='redshift-cluster-1',
-        region_name='us-east-2',
+        region_name={'us-east-2'},
         database='dev',
+        db_user='awsuser',
         sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
         aws_conn_id='aws_default'
     )

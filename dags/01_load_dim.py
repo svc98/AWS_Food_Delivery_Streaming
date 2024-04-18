@@ -6,6 +6,7 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.providers.amazon.aws.operators.redshift_data import RedshiftDataOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
+
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -24,10 +25,13 @@ with DAG(
         catchup=False
 ) as dag:
 
-    create_schema = PostgresOperator(
+    # Create schema if it doesn't exist
+    create_schema = RedshiftDataOperator(
         task_id='create_schema',
-        postgres_conn_id='redshift',
+        cluster_identifier='redshift-cluster-1',
+        database='dev',
         sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
+        aws_conn_id='aws_default'
     )
 
     # Drop tables if they exist
@@ -157,6 +161,8 @@ with DAG(
         task_id="trigger_spark_streaming_dag",
         trigger_dag_id="spark_submit_streaming_job_to_emr",
     )
+
+
 
 # First, create the schema
 create_schema >> [drop_dimCustomers, drop_dimRestaurants, drop_dimDeliveryDrivers, drop_factOrders]

@@ -15,10 +15,10 @@ args = parser.parse_args()
 appName = "KinesisToRedshift"
 kinesisStreamName = "incoming-food-orders-data"
 kinesisRegion = "us-east-2"
-checkpointLocation = "s3://stream-checkpointing/kinesisToRedshift/"
+checkpointLocation = "s3://stream-checkpoint/kinesisToRedshift/"
 redshiftJdbcUrl = f"jdbc:redshift://redshift-cluster-1.c4gvtbzfgnah.us-east-2.redshift.amazonaws.com:5439/dev"
 redshiftTable = "food_delivery_db.factOrders"
-redshiftTempDir = "s3://redshift-temp-data2/temp-data/streaming_temp/"
+redshiftTempDir = "s3://redshift-temp-data3/temp-data/streaming_temp/"
 
 # Define the schema of the incoming JSON data from Kinesis
 schema = StructType([

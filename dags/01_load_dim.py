@@ -30,7 +30,7 @@ with DAG(
         task_id='create_schema',
         database='dev',
         sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
-        aws_conn_id='redshift_conn'
+        aws_conn_id='redshift'
     )
 
     # Drop tables if they exist

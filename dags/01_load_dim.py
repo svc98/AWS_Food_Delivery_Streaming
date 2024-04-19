@@ -31,7 +31,9 @@ with DAG(
         cluster_identifier='redshift-cluster-1',
         database='dev',
         db_user='awsuser',
-        sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;"
+        sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
+        poll_interval=10,
+        wait_for_completion=True
     )
 
     # Drop tables if they exist

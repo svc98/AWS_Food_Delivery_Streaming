@@ -16,7 +16,7 @@ default_args = {
 }
 
 with DAG(
-        'create_and_load_dim',
+        'test_dag',
         default_args=default_args,
         description='ETL for food delivery data into Redshift',
         schedule_interval=None,

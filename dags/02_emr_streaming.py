@@ -27,7 +27,7 @@ aws_secret_key = Variable.get("aws_secret_key")
 
 step_adder = EmrAddStepsOperator(
     task_id='add_step',
-    job_flow_id='j-12NTB1NWODKW4',
+    job_flow_id='j-1XM25Z12SOC0G',
     aws_conn_id='aws_default',
     dag=dag,
     steps=[{

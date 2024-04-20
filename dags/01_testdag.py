@@ -25,7 +25,7 @@ with DAG(
 ) as dag:
 
     create_schema = PostgresOperator(
-        task_id='create_schema',
+        task_id='create_schema_v2',
         postgres_conn_id='redshift',
         sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
     )

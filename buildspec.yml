@@ -8,7 +8,7 @@ phases:
       - echo "Copying DAG files to S3..."
       - aws s3 cp --recursive --debug "./dags" "s3://airflow-custom/dags/"
       - echo "Copying DAG files to S3..."
-      - aws s3 cp --debug "./aws-requirements.txt" "s3://airflow-custom/requirements/requirements.txt"
+      - aws s3 cp --debug "./requirements.txt" "s3://airflow-custom/requirements/requirements.txt"
       - echo "Copying dim data files to S3..."
       - aws s3 cp --recursive --debug "./data" "s3://food-delivery-stream-bucket/dims/"
       - echo "Copying pyspark scripts to S3..."

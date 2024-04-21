@@ -42,6 +42,7 @@ step_adder = EmrAddStepsOperator(
                 '--num-executors', '3',
                 '--executor-memory', '6G',
                 '--executor-cores', '3',
+                '--spark.dynamicAllocation.enabled', 'false',
                 '--packages', packages_list,
                 '--jars', jdbc_jar_s3_path,
                 's3://food-delivery-stream-bucket/pyspark_scripts/pyspark_streaming.py',

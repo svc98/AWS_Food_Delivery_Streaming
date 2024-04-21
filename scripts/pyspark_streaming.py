@@ -14,6 +14,7 @@ args = parser.parse_args()
 
 appName = "KinesisToRedshift"
 kinesisStreamName = "incoming-food-orders-data"
+kinesisEndpointURL = "https://kinesis.us-east-2.amazonaws.com"
 kinesisRegion = "us-east-2"
 checkpointLocation = "s3://stream-checkpoint/kinesisToRedshift/"
 redshiftJdbcUrl = f"jdbc:redshift://redshift-cluster-2.c4gvtbzfgnah.us-east-2.redshift.amazonaws.com:5439/dev"
@@ -44,10 +45,10 @@ df = (spark
       .readStream
       .format("kinesis")
       .option("streamName", kinesisStreamName)
-      .option("startingPosition", "latest")
+      .option("endpointUrl", kinesisEndpointURL)
       .option("region", kinesisRegion)
+      .option("startingPosition", "latest")
       .option("awsUseInstanceProfile", "false")
-      .option("endpointUrl", "https://kinesis.us-east-2.amazonaws.com")
       .option("awsAccessKeyId", args.aws_access_key)
       .option("awsSecretKey", args.aws_secret_key)
       .load())

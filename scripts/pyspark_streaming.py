@@ -16,7 +16,7 @@ appName = "KinesisToRedshift"
 kinesisStreamName = "incoming-food-orders-data"
 kinesisRegion = "us-east-2"
 checkpointLocation = "s3://stream-checkpoint/kinesisToRedshift/"
-redshiftJdbcUrl = f"jdbc:redshift://redshift-cluster-1.c4gvtbzfgnah.us-east-2.redshift.amazonaws.com:5439/dev"
+redshiftJdbcUrl = f"jdbc:redshift://redshift-cluster-2.c4gvtbzfgnah.us-east-2.redshift.amazonaws.com:5439/dev"
 redshiftTable = "food_delivery_db.factOrders"
 redshiftTempDir = "s3://redshift-temp-data3/temp-data/streaming_temp/"
 
@@ -47,7 +47,7 @@ df = (spark
       .option("startingPosition", "latest")
       .option("region", kinesisRegion)
       .option("awsUseInstanceProfile", "false")
-      .option("endpointUrl", "https://kinesis.us-east-1.amazonaws.com")
+      .option("endpointUrl", "https://kinesis.us-east-2.amazonaws.com")
       .option("awsAccessKeyId", args.aws_access_key)
       .option("awsSecretKey", args.aws_secret_key)
       .load())

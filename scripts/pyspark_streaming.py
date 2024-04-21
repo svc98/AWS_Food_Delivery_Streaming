@@ -49,7 +49,6 @@ df = (spark
       .option("region", kinesisRegion)
       .option("startingPosition", "latest")
       .option("awsUseInstanceProfile", "false")
-      .option("spark.dynamicAllocation.enabled", "false")
       .option("awsAccessKeyId", args.aws_access_key)
       .option("awsSecretKey", args.aws_secret_key)
       .load())

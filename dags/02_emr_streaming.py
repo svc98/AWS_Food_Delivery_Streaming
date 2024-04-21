@@ -1,15 +1,11 @@
+from datetime import datetime
 from airflow import DAG
 from airflow.models import Variable
 from airflow.providers.amazon.aws.operators.emr import EmrAddStepsOperator
-from datetime import datetime
 
 
-dag = DAG(
-    'spark_submit_streaming_job_to_emr',
-    start_date=datetime(2021, 1, 1),
-    catchup=False,
-    tags=['streaming'],
-)
+cluster_id = 'j-2KL0AJB7P9N0W'
+aws_conn = 'aws_default'
 
 spark_packages = [
     "com.qubole.spark:spark-sql-kinesis_2.12:1.2.0_spark-3.0",
@@ -25,10 +21,17 @@ aws_access_key = Variable.get("aws_access_key")
 aws_secret_key = Variable.get("aws_secret_key")
 
 
+dag = DAG(
+    'spark_submit_streaming_job_to_emr',
+    start_date=datetime(2021, 1, 1),
+    catchup=False,
+    tags=['streaming'],
+)
+
 step_adder = EmrAddStepsOperator(
     task_id='add_step',
-    job_flow_id='j-1XM25Z12SOC0G',
-    aws_conn_id='aws_default',
+    job_flow_id=cluster_id,
+    aws_conn_id=aws_conn,
     dag=dag,
     steps=[{
         'Name': 'Run PySpark Streaming Script',
@@ -42,7 +45,7 @@ step_adder = EmrAddStepsOperator(
                 '--num-executors', '3',
                 '--executor-memory', '6G',
                 '--executor-cores', '3',
-                '--spark.dynamicAllocation.enabled', 'false',
+                '--spark.dynamicAllocation.minExecutors', '1',
                 '--packages', packages_list,
                 '--jars', jdbc_jar_s3_path,
                 's3://food-delivery-stream-bucket/pyspark_scripts/pyspark_streaming.py',

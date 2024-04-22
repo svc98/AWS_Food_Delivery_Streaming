@@ -39,6 +39,9 @@ schema = StructType([
 # Spark Streaming
 spark = (SparkSession.builder
          .appName(appName)
+         .config("spark.dynamicAllocation.enabled", "true")
+         .config("spark.dynamicAllocation.minExecutors", 1)
+         .config("spark.dynamicAllocation.maxExecutors", 3)
          .getOrCreate())
 
 df = (spark
@@ -49,9 +52,6 @@ df = (spark
       .option("region", kinesisRegion)
       .option("startingPosition", "latest")
       .option("awsUseInstanceProfile", "false")
-      .option("spark.dynamicAllocation.enabled", "true")
-      .option("spark.dynamicAllocation.minExecutors", 1)
-      .option("spark.dynamicAllocation.maxExecutors", 3)
       .option("awsAccessKeyId", args.aws_access_key)
       .option("awsSecretKey", args.aws_secret_key)
       .load())

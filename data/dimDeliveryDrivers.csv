@@ -1,4 +1,4 @@
-RiderID,RiderName,RiderPhone,RiderVehicleType,VehicleID,RiderRating
+DriverID,DriverName,DriverPhone,DriverVehicleType,VehicleID,DriverRating
 1,Diane Ayers,612-484-2442x65607,Scooter,DTN-2113,1.8
 2,David Reese,(595)732-2108x74327,Bike,JUQ-4112,1.7
 3,Mikayla Cooley,+1-751-957-2017,Scooter,EBE-5498,4.5

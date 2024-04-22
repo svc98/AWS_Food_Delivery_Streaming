@@ -16,7 +16,7 @@ fake = Faker()
 kinesis_client = boto3.client('kinesis')
 
 # Directory setup
-base_directory = os.path.dirname(__file__)
+base_directory = os.path.dirname(os.path.dirname(__file__))
 data_directory = os.path.join(base_directory, "data")
 
 

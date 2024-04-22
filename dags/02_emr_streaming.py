@@ -48,7 +48,7 @@ step_adder = EmrAddStepsOperator(
                 '--executor-cores', '3',
                 '--spark.dynamicAllocation.minExecutors', '1',
                 '--spark.dynamicAllocation.maxExecutors', '3',
-                '--packages', packages_list,
+                # '--packages', packages_list,
                 '--jars', jdbc_jar_s3_path,
                 's3://food-delivery-stream-bucket/pyspark_scripts/pyspark_streaming.py',
                 '--redshift_user', redshift_user,

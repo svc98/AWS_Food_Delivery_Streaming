@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from airflow import DAG
 from airflow.models import Variable
@@ -9,7 +10,7 @@ cluster_id = 'j-2KL0AJB7P9N0W'
 aws_conn = 'aws_default'
 
 spark_packages = [
-    "com.qubole.spark:spark-sql-kinesis_2.12:1.2.0_spark-3.0",
+    "org.apache.spark:spark-streaming-kinesis-asl_2.12:3.5.1",
     "io.github.spark-redshift-community:spark-redshift_2.12:6.2.0-spark_3.5"
 ]
 packages_list = ",".join(spark_packages)

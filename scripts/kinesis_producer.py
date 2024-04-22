@@ -1,19 +1,26 @@
-import json
-import random
-import boto3
 import os
+import json
 import time
+import boto3
+import random
 import pandas as pd
-from datetime import datetime
 from faker import Faker
+from config.config import configuration
 
 
-# Kinesis Stream Name
-stream_name = 'incoming-food-orders-data'
+
+# Stream Setup
+os.environ['aws_access_key_id'] = configuration.get("AWS_ACCESS_KEY")
+os.environ['aws_secret_access_key'] = configuration.get("AWS_SECRET_KEY")
+os.environ['aws_region'] = configuration.get("AWS_REGION")
+stream_name = configuration.get("STREAM_NAME")
 
 # Initialize Faker and Boto3 Kinesis client
 fake = Faker()
-kinesis_client = boto3.client('kinesis')
+kinesis_client = boto3.client('kinesis',
+                              aws_access_key_id=configuration.get("AWS_ACCESS_KEY"),
+                              aws_secret_access_key=configuration.get("AWS_SECRET_KEY"),
+                              region_name=configuration.get("AWS_REGION"))
 
 # Directory setup
 base_directory = os.path.dirname(os.path.dirname(__file__))
@@ -46,18 +53,20 @@ def send_order_to_kinesis(stream_name, order):
         Data=json.dumps(order),
         PartitionKey=str(order['OrderID'])                                                                                # Using OrderID as the partition key
     )
-    print(f"Sent order to Kinesis with Sequence Number: {response['SequenceNumber']}")
-
-
-# Load data IDs from files
-customer_ids = load_ids_from_csv('dimCustomers.csv', 'CustomerID')
-restaurant_ids = load_ids_from_csv('dimRestaurants.csv', 'RestaurantID')
-driver_ids = load_ids_from_csv('dimDeliveryDrivers.csv', 'DriverID')
-
-# Order ID initialization
-order_id = 1000
-for _ in range(1000):
-    order = generate_order(customer_ids, restaurant_ids, driver_ids, order_id)
     print(order)
-    send_order_to_kinesis(stream_name, order)
-    order_id += 1                                                                                                         # Increment OrderID for the next order
+    print(f"Order sent to Kinesis Stream --- ShardID: {response['ShardId']} and Sequence Number: {response['SequenceNumber']}")
+
+
+if __name__ == "__main__":
+    # Load data IDs from files
+    customer_ids = load_ids_from_csv('dimCustomers.csv', 'CustomerID')
+    restaurant_ids = load_ids_from_csv('dimRestaurants.csv', 'RestaurantID')
+    driver_ids = load_ids_from_csv('dimDeliveryDrivers.csv', 'DriverID')
+
+    # Sending Order Data to Kinesis
+    order_id = 1000
+    for _ in range(1000):
+        order = generate_order(customer_ids, restaurant_ids, driver_ids, order_id)
+        send_order_to_kinesis(stream_name, order)
+        order_id += 1                                                                                                         # Increment OrderID for the next order
+        time.sleep(1)

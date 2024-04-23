@@ -39,9 +39,9 @@ schema = StructType([
 # Spark Streaming
 spark = (SparkSession.builder
          .appName(appName)
-         .config("spark.dynamicAllocation.enabled", "true")
-         .config("spark.dynamicAllocation.minExecutors", 1)
-         .config("spark.dynamicAllocation.maxExecutors", 3)
+         # .config("spark.dynamicAllocation.enabled", "true")
+         # .config("spark.dynamicAllocation.minExecutors", 1)
+         # .config("spark.dynamicAllocation.maxExecutors", 3)
          .getOrCreate())
 
 df = (spark

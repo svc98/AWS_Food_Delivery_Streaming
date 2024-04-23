@@ -26,7 +26,7 @@ schema = StructType([
     StructField("OrderID", IntegerType(), True),
     StructField("CustomerID", IntegerType(), True),
     StructField("RestaurantID", IntegerType(), True),
-    StructField("RiderID", IntegerType(), True),
+    StructField("DriverID", IntegerType(), True),
     StructField("OrderDate", TimestampType(), True),
     StructField("DeliveryTime", IntegerType(), True),
     StructField("OrderValue", DecimalType(8, 2), True),

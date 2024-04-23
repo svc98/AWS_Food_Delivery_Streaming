@@ -6,7 +6,7 @@ from airflow.providers.amazon.aws.operators.emr import EmrAddStepsOperator
 
 
 os.environ['AWS_DEFAULT_REGION'] = 'us-east-2'
-cluster_id = 'j-2KL0AJB7P9N0W'
+cluster_id = 'j-1NC509QN78RYF'
 aws_conn = 'aws_default'
 
 spark_packages = [

@@ -5,6 +5,7 @@ from airflow.models import Variable
 from airflow.providers.amazon.aws.operators.emr import EmrAddStepsOperator
 
 
+
 os.environ['AWS_DEFAULT_REGION'] = 'us-east-2'
 cluster_id = 'j-23SLD7VV881YS'
 aws_conn = 'aws_default'
@@ -23,7 +24,7 @@ aws_access_key = Variable.get("aws_access_key")
 aws_secret_key = Variable.get("aws_secret_key")
 
 dag = DAG(
-    'spark_submit_streaming_job_to_emr',
+    'Spark_Submit_Job_to_EMR',
     start_date=datetime(2021, 1, 1),
     catchup=False,
     tags=['streaming'],

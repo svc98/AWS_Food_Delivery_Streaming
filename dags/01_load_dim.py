@@ -2,8 +2,6 @@ import os
 from datetime import timedelta
 from airflow import DAG
 from airflow.utils.dates import days_ago
-from airflow.providers.amazon.aws.transfers.s3_to_redshift import S3ToRedshiftOperator
-from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.providers.amazon.aws.operators.redshift_data import RedshiftDataOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
@@ -24,7 +22,7 @@ default_args = {
 }
 
 with DAG(
-        'create_and_load_dim',
+        'Dim_Fact_Table_Setup',
         default_args=default_args,
         description='ETL for food delivery data into Redshift',
         schedule_interval=None,
@@ -219,7 +217,7 @@ with DAG(
     # Run Pyspark EMR
     trigger_spark_streaming_dag = TriggerDagRunOperator(
         task_id="trigger_spark_streaming_dag",
-        trigger_dag_id="spark_submit_streaming_job_to_emr"
+        trigger_dag_id="Spark_Submit_Job_to_EMR"
     )
 
 

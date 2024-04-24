@@ -5,7 +5,7 @@ from pyspark.sql.types import StructType, StructField, IntegerType, StringType, 
 
 
 appName = "KinesisToRedshift"
-kinesisStreamName = "incoming-food-orders"
+kinesisStreamName = "incoming-orders"
 kinesisEndpointURL = "https://kinesis.us-east-2.amazonaws.com"
 kinesisRegion = "us-east-2"
 checkpointLocation = "s3://stream-checkpoint/kinesisToRedshift/"

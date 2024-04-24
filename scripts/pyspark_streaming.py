@@ -1,16 +1,8 @@
+import argparse
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, DecimalType, TimestampType
-import argparse
 
-
-# Variables and Setup
-parser = argparse.ArgumentParser(description='PySpark Streaming Job Args')
-parser.add_argument('--redshift_user', required=True, help='Redshift Username')
-parser.add_argument('--redshift_password', required=True, help='Redshift Password')
-parser.add_argument('--aws_access_key', required=True, help='aws_access_key')
-parser.add_argument('--aws_secret_key', required=True, help='aws_secret_key')
-args = parser.parse_args()
 
 appName = "KinesisToRedshift"
 kinesisStreamName = "incoming-food-orders"
@@ -20,6 +12,14 @@ checkpointLocation = "s3://stream-checkpoint/kinesisToRedshift/"
 redshiftJdbcUrl = f"jdbc:redshift://redshift-cluster-2.c4gvtbzfgnah.us-east-2.redshift.amazonaws.com:5439/dev"
 redshiftTable = "food_delivery_db.factOrders"
 redshiftTempDir = "s3://redshift-temp-data3/temp-data/streaming_temp/"
+
+# Variables and Setup
+parser = argparse.ArgumentParser(description='PySpark Streaming Job Args')
+parser.add_argument('--redshift_user', required=True, help='Redshift Username')
+parser.add_argument('--redshift_password', required=True, help='Redshift Password')
+parser.add_argument('--aws_access_key', required=True, help='aws_access_key')
+parser.add_argument('--aws_secret_key', required=True, help='aws_secret_key')
+args = parser.parse_args()
 
 # Define the schema of the incoming JSON data from Kinesis
 schema = StructType([
@@ -39,9 +39,6 @@ schema = StructType([
 # Spark Streaming
 spark = (SparkSession.builder
          .appName(appName)
-         # .config("spark.dynamicAllocation.enabled", "true")
-         # .config("spark.dynamicAllocation.minExecutors", 1)
-         # .config("spark.dynamicAllocation.maxExecutors", 3)
          .getOrCreate())
 
 df = (spark
@@ -51,7 +48,7 @@ df = (spark
       .option("endpointUrl", kinesisEndpointURL)
       .option("region", kinesisRegion)
       .option("startingPosition", "latest")
-      .option("awsUseInstanceProfile", "false")
+      .option("awsUseInstanceProfile", "false")                                                                             # Issue
       .option("awsAccessKeyId", args.aws_access_key)
       .option("awsSecretKey", args.aws_secret_key)
       .load())

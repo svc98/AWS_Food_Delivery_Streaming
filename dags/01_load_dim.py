@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 from airflow import DAG
 from airflow.utils.dates import days_ago
@@ -7,6 +8,11 @@ from airflow.providers.amazon.aws.operators.redshift_data import RedshiftDataOpe
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
 
+
+os.environ['AWS_DEFAULT_REGION'] = 'us-east-2'
+cluster_identifier = 'redshift-cluster-2'
+database = 'dev'
+db_user = 'awsuser'
 
 default_args = {
     'owner': 'airflow',
@@ -29,43 +35,61 @@ with DAG(
     # Create schema if it doesn't exist
     create_schema = RedshiftDataOperator(
         task_id='create_schema',
-        cluster_identifier='redshift-cluster-1',
-        database='dev',
-        db_user='awsuser',
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
         sql="CREATE SCHEMA IF NOT EXISTS food_delivery_db;",
         poll_interval=10,
         wait_for_completion=True
     )
 
-    # Drop tables if they exist
-    drop_dimCustomers = PostgresOperator(
+    # Drop dimension and fact tables
+    drop_dimCustomers = RedshiftDataOperator(
         task_id='drop_dimCustomers',
-        postgres_conn_id='redshift_conn',
-        sql="DROP TABLE IF EXISTS food_delivery_db.dimCustomers;",
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
+        sql="DROP TABLE IF EXISTS food_delivery_db.dimCustomers CASCADE;",
+        poll_interval=10,
+        wait_for_completion=True
     )
 
-    drop_dimRestaurants = PostgresOperator(
+    drop_dimRestaurants = RedshiftDataOperator(
         task_id='drop_dimRestaurants',
-        postgres_conn_id='redshift_conn',
-        sql="DROP TABLE IF EXISTS food_delivery_db.dimRestaurants;",
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
+        sql="DROP TABLE IF EXISTS food_delivery_db.dimRestaurants CASCADE;",
+        poll_interval=10,
+        wait_for_completion=True
     )
 
-    drop_dimDeliveryDrivers = PostgresOperator(
+    drop_dimDeliveryDrivers = RedshiftDataOperator(
         task_id='drop_dimDeliveryDrivers',
-        postgres_conn_id='redshift_conn',
-        sql="DROP TABLE IF EXISTS food_delivery_db.dimDeliveryDrivers;",
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
+        sql="DROP TABLE IF EXISTS food_delivery_db.dimDeliveryDrivers CASCADE;",
+        poll_interval=10,
+        wait_for_completion=True
     )
 
-    drop_factOrders = PostgresOperator(
+    drop_factOrders = RedshiftDataOperator(
         task_id='drop_factOrders',
-        postgres_conn_id='redshift_conn',
-        sql="DROP TABLE IF EXISTS food_delivery_db.factOrders;",
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
+        sql="DROP TABLE IF EXISTS food_delivery_db.factOrders CASCADE;",
+        poll_interval=10,
+        wait_for_completion=True
     )
 
-    # Create dimension and fact tables
-    create_dimCustomers = PostgresOperator(
+    # Recreate dimension and fact tables
+    create_dimCustomers = RedshiftDataOperator(
         task_id='create_dimCustomers',
-        postgres_conn_id='redshift_conn',
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
         sql="""
             CREATE TABLE food_delivery_db.dimCustomers (
                 CustomerID INT PRIMARY KEY,
@@ -76,11 +100,15 @@ with DAG(
                 RegistrationDate DATE
             );
         """,
+        poll_interval=10,
+        wait_for_completion=True
     )
 
-    create_dimRestaurants = PostgresOperator(
+    create_dimRestaurants = RedshiftDataOperator(
         task_id='create_dimRestaurants',
-        postgres_conn_id='redshift_conn',
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
         sql="""
             CREATE TABLE food_delivery_db.dimRestaurants (
                 RestaurantID INT PRIMARY KEY,
@@ -90,11 +118,15 @@ with DAG(
                 RestaurantRating DECIMAL(3,1)
             );
         """,
+        poll_interval=10,
+        wait_for_completion=True
     )
 
-    create_dimDeliveryDrivers = PostgresOperator(
+    create_dimDeliveryDrivers = RedshiftDataOperator(
         task_id='create_dimDeliveryDrivers',
-        postgres_conn_id='redshift_conn',
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
         sql="""
             CREATE TABLE food_delivery_db.dimDeliveryDrivers (
                 DriverID INT PRIMARY KEY,
@@ -105,11 +137,15 @@ with DAG(
                 DriverRating DECIMAL(3,1)
             );
         """,
+        poll_interval=10,
+        wait_for_completion=True
     )
 
-    create_factOrders = PostgresOperator(
+    create_factOrders = RedshiftDataOperator(
         task_id='create_factOrders',
-        postgres_conn_id='redshift_conn',
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
         sql="""
             CREATE TABLE food_delivery_db.factOrders (
                 OrderID INT PRIMARY KEY,
@@ -124,45 +160,66 @@ with DAG(
                 OrderStatus VARCHAR(50)
             );
         """,
+        poll_interval=10,
+        wait_for_completion=True
     )
 
-    # Load data into dimension tables from S3
-    load_dimCustomers = S3ToRedshiftOperator(
+    # Load dimension tables only
+    load_dimCustomers = RedshiftDataOperator(
         task_id='load_dimCustomers',
-        schema='food_delivery_db',
-        table='dimCustomers',
-        s3_bucket='food-delivery-stream',
-        s3_key='dim/dimCustomers.csv',
-        copy_options=['CSV', 'IGNOREHEADER 1', 'QUOTE as \'"\''],
-        aws_conn_id='aws_default',
-        redshift_conn_id='redshift_conn',
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
+        sql="""
+            copy food_delivery_db.dimCustomers
+            from 's3://food-delivery-stream-bucket/dims/dimCustomers.csv'
+            iam_role 'arn:aws:iam::891377180984:role/service-role/AmazonRedshift-CommandsAccessRole-20240405T160936'
+            CSV
+            delimiter ','
+            ignoreheader 1;
+            """,
+        poll_interval=10,
+        wait_for_completion=True
     )
 
-    load_dimRestaurants = S3ToRedshiftOperator(
+    load_dimRestaurants = RedshiftDataOperator(
         task_id='load_dimRestaurants',
-        schema='food_delivery_db',
-        table='dimRestaurants',
-        s3_bucket='food-delivery-stream',
-        s3_key='dim/dimRestaurants.csv',
-        copy_options=['CSV', 'IGNOREHEADER 1', 'QUOTE as \'"\''],
-        aws_conn_id='aws_default',
-        redshift_conn_id='redshift_conn',
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
+        sql="""
+            copy food_delivery_db.dimRestaurants
+            from 's3://food-delivery-stream-bucket/dims/dimRestaurants.csv'
+            iam_role 'arn:aws:iam::891377180984:role/service-role/AmazonRedshift-CommandsAccessRole-20240405T160936'
+            CSV
+            delimiter ','
+            ignoreheader 1;
+            """,
+        poll_interval=10,
+        wait_for_completion=True
     )
 
-    load_dimDeliveryDrivers = S3ToRedshiftOperator(
+    load_dimDeliveryDrivers = RedshiftDataOperator(
         task_id='load_dimDeliveryDrivers',
-        schema='food_delivery_db',
-        table='dimDeliveryDrivers',
-        s3_bucket='food-delivery-stream',
-        s3_key='dim/dimDeliveryDrivers.csv',
-        copy_options=['CSV', 'IGNOREHEADER 1', 'QUOTE as \'"\''],
-        aws_conn_id='aws_default',
-        redshift_conn_id='redshift_conn',
+        cluster_identifier=cluster_identifier,
+        database=database,
+        db_user=db_user,
+        sql="""
+            copy food_delivery_db.dimDeliveryDrivers
+            from 's3://food-delivery-stream-bucket/dims/dimDeliveryDrivers.csv'
+            iam_role 'arn:aws:iam::891377180984:role/service-role/AmazonRedshift-CommandsAccessRole-20240405T160936'
+            CSV
+            delimiter ','
+            ignoreheader 1;
+            """,
+        poll_interval=10,
+        wait_for_completion=True
     )
 
+    # Run Pyspark EMR
     trigger_spark_streaming_dag = TriggerDagRunOperator(
         task_id="trigger_spark_streaming_dag",
-        trigger_dag_id="spark_submit_streaming_job_to_emr",
+        trigger_dag_id="spark_submit_streaming_job_to_emr"
     )
 
 
